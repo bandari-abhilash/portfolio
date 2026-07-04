@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Abhilash Bandari — Backend Developer Resume</title>
+<style>
+  /* ATS-safe: single column, standard fonts, real text, no graphics */
+  @page { size: A4; margin: 10mm 14mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9.3pt;
+    line-height: 1.3;
+    color: #111;
+    margin: 0 auto;
+    max-width: 760px;
+    padding: 24px;
+  }
+  @media print { body { padding: 0; max-width: none; } }
+  h1 {
+    font-size: 20pt;
+    margin: 0 0 2px;
+    letter-spacing: 0.5px;
+  }
+  .role {
+    font-size: 11pt;
+    font-weight: bold;
+    margin: 0 0 4px;
+  }
+  .contact {
+    margin: 0 0 10px;
+    font-size: 9pt;
+  }
+  .contact a { color: #111; text-decoration: none; }
+  h2 {
+    font-size: 10pt;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #111;
+    padding-bottom: 1px;
+    margin: 9px 0 4px;
+  }
+  p { margin: 0 0 5px; }
+  ul { margin: 2px 0 6px; padding-left: 16px; }
+  li { margin-bottom: 1.5px; }
+  .job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 5px;
+  }
+  .job-title { font-size: 10.3pt; font-weight: bold; }
+  .job-dates { font-size: 9pt; white-space: nowrap; }
+  .job-company { font-size: 9.5pt; margin: 0 0 3px; }
+  .skills-line { margin: 0 0 3px; }
+  .skills-line strong { display: inline; }
+  .project { margin-bottom: 3px; }
+  .project a { color: #111; }
+</style>
+</head>
+<body>
+  <h1>ABHILASH BANDARI</h1>
+  <p class="role">Backend Developer</p>
+  <p class="contact">
+    Delhi, India &nbsp;|&nbsp; +91-9014409268 &nbsp;|&nbsp;
+    <a href="mailto:bandariabhilash0@gmail.com">bandariabhilash0@gmail.com</a> &nbsp;|&nbsp;
+    <a href="https://linkedin.com/in/abhilash-bandari">linkedin.com/in/abhilash-bandari</a> &nbsp;|&nbsp;
+    <a href="https://github.com/bandari-abhilash">github.com/bandari-abhilash</a> &nbsp;|&nbsp;
+    <a href="https://medium.com/@bandariabhilash0">medium.com/@bandariabhilash0</a>
+  </p>
+
+  <h2>Summary</h2>
+  <p>
+    Backend developer with 5+ years of experience designing and operating high-performance,
+    low-latency distributed systems in Go, Python, and C#. Architected a real-time market-data
+    broadcast system with ~40ms end-to-end latency and an in-house charts platform on
+    self-hosted TimescaleDB serving 8B+ records at 30ms p99, saving ₹2 Cr annually. Led the
+    migration of on-premise trading platforms to AWS. Currently leading a team of 4 engineers
+    at SMC Global Securities.
+  </p>
+
+  <h2>Skills</h2>
+  <p class="skills-line"><strong>Languages:</strong> Go (Golang), Python, C#, JavaScript (Node.js), Shell Scripting</p>
+  <p class="skills-line"><strong>Databases &amp; Search:</strong> PostgreSQL, TimescaleDB, MongoDB, MSSQL, Redis, Apache Solr, InfluxDB</p>
+  <p class="skills-line"><strong>Cloud &amp; DevOps:</strong> AWS (EC2, ECS, S3, Lambda, API Gateway, NLB/ALB, Transit Gateway, VPC, WAF, Direct Connect), Docker, Kubernetes, CI/CD, Linux</p>
+  <p class="skills-line"><strong>Realtime &amp; Architecture:</strong> gRPC, WebSockets, UDP Multicast, REST APIs, Microservices, Event-Driven Systems</p>
+
+  <h2>Experience</h2>
+
+  <div class="job-header">
+    <span class="job-title">Member of Technical Staff-3</span>
+    <span class="job-dates">Aug 2023 – Present</span>
+  </div>
+  <p class="job-company">SMC Global Securities — financial services and trading — Delhi, India</p>
+  <ul>
+    <li>Architected and developed a high-performance broadcast/market-feed system in Go and C#, delivering real-time trading data from exchanges with ~40ms end-to-end latency.</li>
+    <li>Architected an in-house charts platform end to end on self-hosted TimescaleDB — designed the schema, ingestion, and query layer for 8B+ time-series records, serving chart APIs at 30ms p99 latency and saving ₹2 Cr annually in vendor fees.</li>
+    <li>Led the migration of on-premise trading systems to AWS using Direct Connect, GRE tunnels, and Transit Gateway, improving system stability by 85%.</li>
+    <li>Resolved packet drops in the trading network through Linux kernel-level tuning, reducing drops by 65%.</li>
+    <li>Developed and scaled a stateless GTT order system and price-alerts service in Go for reliability and horizontal scalability.</li>
+    <li>Optimized Apache Solr search configuration and queries, achieving a p99 latency of 70ms.</li>
+    <li>Redesigned the beginning-of-day (BOD) batch process in Python, cutting runtime from 4 hours to 30 minutes.</li>
+    <li>Provide technical leadership and mentorship to a team of 4 developers.</li>
+  </ul>
+
+  <div class="job-header">
+    <span class="job-title">Software Engineer</span>
+    <span class="job-dates">Jun 2023 – Aug 2023</span>
+  </div>
+  <p class="job-company">KorelOT Solutions — IoT — Vadodara, India (Remote)</p>
+  <ul>
+    <li>Designed and implemented a microservice to migrate stored documents to Azure Blob Storage, cutting storage costs by approximately $4K per year.</li>
+    <li>Optimized client-facing APIs, reducing p99 latency from 960ms to 98ms.</li>
+  </ul>
+
+  <div class="job-header">
+    <span class="job-title">Software Engineer</span>
+    <span class="job-dates">Apr 2021 – Jun 2023</span>
+  </div>
+  <p class="job-company">BYJU'S (Think &amp; Learn) — edtech — Bangalore, India (Remote)</p>
+  <ul>
+    <li>Integrated logistics APIs processing 105,000+ daily shipments; designed and implemented a job-orders management system in Go.</li>
+    <li>Built microservices for the Supply Chain and Digital Finance verticals, handling transactions exceeding $1M monthly.</li>
+    <li>Developed real-time analytics dashboards (React, Node.js) and a customer-facing book-delivery tracking platform.</li>
+    <li>Led and mentored a team of 4 developers.</li>
+  </ul>
+
+  <h2>Open-Source Projects</h2>
+  <div class="project">
+    <strong>connection-dump</strong> (Go) — tcpdump alternative for port-based TCP/UDP traffic monitoring with configurable reporting.
+    <a href="https://github.com/bandari-abhilash/connection-dump">github.com/bandari-abhilash/connection-dump</a>
+  </div>
+  <div class="project">
+    <strong>multicast-test-tool</strong> (Go) — CLI to verify UDP multicast connectivity between a source and multiple destinations.
+    <a href="https://github.com/bandari-abhilash/mutlicast-test-tool">github.com/bandari-abhilash/mutlicast-test-tool</a>
+  </div>
+  <div class="project">
+    <strong>migration-scripts</strong> (Python) — Redis and Apache Solr migration utilities with OOM-safe batching; migrates datasets between environments in minutes.
+    <a href="https://github.com/bandari-abhilash/migration-scripts">github.com/bandari-abhilash/migration-scripts</a>
+  </div>
+  <div class="project">
+    <strong>Technical writing</strong> — articles on networking, Docker/AWS multicast, and Solr operations at
+    <a href="https://medium.com/@bandariabhilash0">medium.com/@bandariabhilash0</a>
+  </div>
+
+  <h2>Education</h2>
+  <div class="job-header">
+    <span class="job-title">Bachelor of Technology, Computer Science &amp; Engineering</span>
+    <span class="job-dates">2017 – 2021</span>
+  </div>
+  <p class="job-company">Guru Nanak Institutions, Hyderabad, India</p>
+</body>
+</html>
