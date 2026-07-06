@@ -2,10 +2,26 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   setupNav();
+  setupThemeToggle();
   setupReveal();
   setupStatCounters();
   setupCopyEmail();
 });
+
+// --- Light/dark theme toggle (light is the default) ---
+function setupThemeToggle() {
+  const btn = document.getElementById("theme-toggle");
+  if (!btn) return;
+
+  btn.addEventListener("click", () => {
+    const next =
+      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem("theme", next);
+    } catch {}
+  });
+}
 
 // --- Navigation: mobile toggle, scrolled state, active link ---
 function setupNav() {
