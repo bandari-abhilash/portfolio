@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCopyEmail();
 });
 
-// --- Light/dark theme toggle (light is the default) ---
+//theme toggle
 function setupThemeToggle() {
   const btn = document.getElementById("theme-toggle");
   if (!btn) return;
@@ -19,7 +19,7 @@ function setupThemeToggle() {
     document.documentElement.dataset.theme = next;
     try {
       localStorage.setItem("theme", next);
-    } catch {}
+    } catch { }
   });
 }
 
