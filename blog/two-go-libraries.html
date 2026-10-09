@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <script>
+        /* Apply saved theme before first paint to avoid a flash */
+        try {
+            var t = localStorage.getItem("theme");
+            if (t === "dark" || t === "light") document.documentElement.dataset.theme = t;
+        } catch (e) { }
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>I Lost a Benchmark to C++ by 10x, and Shipped Anyway — Abhilash Bandari</title>
+    <meta name="description"
+        content="Two small pure-Go libraries for exchange market data: fastfix (FAST protocol) and lzo1z (LZO1Z decompression). A one-constant bug, a drifting price, and an honest benchmark." />
+    <meta property="og:title" content="I Lost a Benchmark to C++ by 10x, and Shipped Anyway" />
+    <meta property="og:description"
+        content="Two small pure-Go libraries for exchange market data, a one-constant bug, a drifting price, and an honest benchmark." />
+    <meta property="og:type" content="article" />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="../style.css" />
+</head>
+
+<body>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <span class="logo-mark">ab</span><span class="logo-cursor">_</span>
+            </a>
+            <div class="nav-menu" id="nav-menu">
+                <a href="../index.html#about" class="nav-link">About</a>
+                <a href="../index.html#experience" class="nav-link">Experience</a>
+                <a href="../index.html#projects" class="nav-link">Projects</a>
+                <a href="../index.html#blog" class="nav-link">Blog</a>
+                <a href="../index.html#contact" class="nav-link">Contact</a>
+                <a href="../AbhilashBandari-Resume.pdf" target="_blank"
+                    class="btn btn--outline btn--sm nav-resume">Resume</a>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Switch between light and dark mode">
+                    <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="article">
+        <div class="article-container">
+            <a class="article-back" href="../index.html#blog">← All writing</a>
+
+            <header class="article-header">
+                <div class="blog-meta">
+                    <time datetime="2026-10-09">Oct 9, 2026</time>
+                    <ul class="tags tags--sm">
+                        <li>go</li>
+                        <li>market-data</li>
+                        <li>open-source</li>
+                    </ul>
+                </div>
+                <h1>I Lost a Benchmark to C++ by 10x, and Shipped Anyway</h1>
+                <p class="article-subtitle">
+                    Two small Go libraries for exchange market data, a bug that was one
+                    number wide, and a price that wouldn't sit still.
+                </p>
+            </header>
+
+            <div class="article-body">
+                <p>
+                    Every job has a part nobody puts on the poster. In trading systems,
+                    it's market data plumbing. Before a single price reaches the clever
+                    stuff, someone has to take whatever the exchange throws over the wall
+                    and turn it back into numbers. That someone usually has a hex dump open
+                    in one window and a 40-page PDF spec in the other.
+                </p>
+                <p>
+                    I've been that someone for a while. This year I pulled two pieces of
+                    that plumbing out into open-source Go libraries.
+                    <a href="https://github.com/bandari-abhilash/fastfix" target="_blank" rel="noopener">fastfix</a>
+                    decodes the FAST protocol.
+                    <a href="https://github.com/bandari-abhilash/LZO-GO" target="_blank" rel="noopener">lzo1z</a>
+                    decompresses LZO1Z. Neither name is winning a branding award. Both do
+                    exactly one thing.
+                </p>
+                <p>
+                    This is the story of why they exist, what bit me along the way, and the
+                    benchmark I almost didn't publish.
+                </p>
+
+                <h2>The cgo tax</h2>
+                <p>
+                    The usual way to reuse an old C library from Go is cgo. It works. It
+                    also means your lovely single static binary now needs a C compiler to
+                    build, cross-compiling turns into a hobby, and every call pays a small
+                    toll crossing the border between Go and C. When you're calling something
+                    on every single packet, small tolls stop being small.
+                </p>
+                <p>
+                    So the plan for both libraries was boring on purpose: pure Go, nothing
+                    outside the standard library, <code>go get</code> and you're done.
+                </p>
+
+                <h2>lzo1z, or: the bug that was one number wide</h2>
+                <p>
+                    LZO is a family of compression algorithms from the nineties that refuses
+                    to retire, mostly because it decompresses absurdly fast. It comes in
+                    flavours. LZO1X is the famous one, and Go already has decoders for it.
+                    LZO1Z is the cousin nobody invites to things. It still turns up in a
+                    handful of exchange feeds and older embedded protocols.
+                </p>
+                <p>
+                    Here's the fun part. The difference between the two is one constant.
+                    A single number inside the decoder is <code>0x0800</code> in LZO1X and
+                    <code>0x0700</code> in LZO1Z. Same format, same everything else. Hand
+                    LZO1Z data to an LZO1X decoder and, if you're lucky, you get an error.
+                    If you're not, you get bytes that look completely reasonable and are
+                    wrong.
+                </p>
+                <p>
+                    Looks-reasonable-but-wrong is my least favourite kind of bug. An error
+                    wakes you up. A plausible wrong answer lets you sleep, then ruins your
+                    Tuesday.
+                </p>
+                <p>
+                    So the lzo1z README has a section called <em>LZO1Z is not LZO1X</em>,
+                    and it's the first thing you see after the install line. I'd rather
+                    annoy someone with a warning than have them discover it in production.
+                </p>
+                <p>
+                    A few things I'm quietly pleased with. It never writes past the buffer
+                    you give it, so a buffer that's too small gets a clean error instead of
+                    corrupted memory. The tests take a real compressed file, chop it off at
+                    every possible length, and demand an error from every single stub. And
+                    it does all this at around 2 GB/s on a laptop without allocating any
+                    memory.
+                </p>
+                <p>
+                    One thing I'm less pleased with, more resigned to: it's GPL. It's a port
+                    of the original C library, which is GPL, so the port is too. And because
+                    Go builds static binaries, if you import it and <em>ship</em> your
+                    program to someone, your program is GPL as well. Running it on your own
+                    servers is fine. That warning also sits right at the top of the README,
+                    because "surprise, your product is open source now" is not an email
+                    anyone wants from Legal.
+                </p>
+
+                <h2>fastfix, or: the friend who only tells you what changed</h2>
+                <p>
+                    FAST stands for <em>FIX Adapted for STreaming</em>. It's an acronym with
+                    another acronym inside it, which is very on brand for finance. Lots of
+                    exchanges use it to squeeze market data onto the wire.
+                </p>
+                <p>
+                    The idea behind FAST is that it hates repeating itself. If the last
+                    message said the price was 22,450.50, the next one might just say "plus
+                    five". If a field hasn't changed, it might not mention it at all. Sender
+                    and receiver each keep a little notebook of the last values they saw
+                    (the spec calls it a dictionary), and every message is basically a list
+                    of edits to that notebook.
+                </p>
+                <p>
+                    It's a brilliant way to save bandwidth. It's also a brilliant way to
+                    confuse yourself.
+                </p>
+
+                <h2>The price that drifted</h2>
+                <p>
+                    Market data usually arrives over UDP, and most feeds encode each packet
+                    on its own, against a blank notebook. That means the decoder has to
+                    wipe its notebook at every packet boundary.
+                </p>
+                <p>
+                    Forget, and nothing crashes. The first packet decodes perfectly. The
+                    second one applies "plus five" to whatever the previous packet left
+                    behind, so the price comes out a little off. The third is a little more
+                    off. Nothing fails. The numbers just drift, politely, until someone
+                    downstream asks why the order book looks drunk.
+                </p>
+                <p>
+                    In fastfix the fix is one line, <code>dec.Ctx.Reset()</code>, and the
+                    README has a section literally titled <em>Context resets — read this
+                    one</em>. There's also a test that checks both sides: decode twice
+                    without a reset and assert the answer is <strong>wrong</strong>, then
+                    reset and assert it's right. A test that insists on a wrong answer
+                    looks odd until you've chased this bug once.
+                </p>
+                <p>
+                    Prices got the same treatment. FAST sends a decimal as a whole number
+                    plus an exponent, so 107.15 can arrive as (10715, −2) or as
+                    (1071500, −4), and fastfix treats them as the same number. Ask for a
+                    price as an integer when it has a fractional part, and you get a "no"
+                    rather than a quietly rounded value. Silently rounding a price is worse
+                    than refusing it.
+                </p>
+
+                <h2>Then I benchmarked it, and got humbled</h2>
+                <p>
+                    People like numbers, so I measured. Honestly, which turned out to be
+                    the important word.
+                </p>
+                <p>
+                    I built one test packet: a market data update carrying ten order-book
+                    entries, 174 bytes in all. Then I had every FAST library I could get
+                    running decode those exact bytes, wipe the notebook before each packet,
+                    and read back every price and size. Each one also had to produce the
+                    same checksum or its time didn't count. A fast decoder that gets the
+                    wrong answer is just a random number generator with good marketing.
+                </p>
+                <p>One CPU core, Apple M5, time per packet:</p>
+                <pre><code>mFAST (C++), generated code       0.27 µs
+mFAST (C++), runtime templates    0.67 µs
+fastlib (Rust), callback*         1.87 µs
+OpenFAST (Java)                   2.41 µs
+fastfix (Go)                      2.55 µs
+goFAST (Go), hand-written         2.92 µs
+fastlib (Rust), structs           4.81 µs
+goFAST (Go), reflection           5.22 µs</code></pre>
+                <p class="article-note">
+                    * Streams values past a callback without building a message, so it does
+                    less work than the rest.
+                </p>
+                <p>
+                    The good news: fastfix is the fastest Go FAST decoder I could find, and
+                    it gets there without asking you to write code for every message type.
+                    It's neck and neck with OpenFAST, the Java reference implementation that
+                    a lot of the industry grew up on.
+                </p>
+                <p>
+                    The humbling news: mFAST, a C++ library, is four to ten times faster
+                    and allocates no memory per packet. fastfix allocates about 5 KB per
+                    packet, because every message becomes a brand new map.
+                </p>
+                <p>
+                    I did think about leaving mFAST out of the README. Then I pictured
+                    someone running the benchmark themselves, spotting it, and wondering
+                    what else I'd left out. So it's in there, with the reasons.
+                </p>
+                <p>
+                    Those same allocations showed up when I threw more cores at it. With
+                    Go's garbage collector on, throughput peaked at four cores and then
+                    actually got worse. With the collector switched off for the experiment,
+                    it kept climbing to roughly 1.9 million packets a second on ten cores.
+                    So the decoders aren't fighting each other. They're just producing a
+                    lot of garbage for the collector to clean up. That's the next thing to
+                    fix, and now there's a number to beat.
+                </p>
+
+                <h2>Things I'd tell past me</h2>
+                <p>
+                    Pure Go is worth the extra work for anything on the hot path. A build
+                    with no C compiler in it keeps paying you back.
+                </p>
+                <p>
+                    Put the dangerous thing at the top of the README. Most people stop
+                    reading right after the install command, so that's where the warning
+                    goes.
+                </p>
+                <p>
+                    Prefer loud failures. An error is a favour. A plausible wrong number is
+                    a loan, and the interest is brutal.
+                </p>
+                <p>
+                    And benchmark against the scary competitor too. Losing on the record
+                    beats getting found out later.
+                </p>
+
+                <hr />
+
+                <p>
+                    Both libraries are on GitHub:
+                    <a href="https://github.com/bandari-abhilash/fastfix" target="_blank" rel="noopener">fastfix</a>
+                    and
+                    <a href="https://github.com/bandari-abhilash/LZO-GO" target="_blank" rel="noopener">lzo1z</a>.
+                    If you work with exchange feeds and one of them saves you a week, I'd
+                    love to hear about it. If one of them costs you a week, I definitely
+                    want to hear about it.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 Abhilash Bandari · Built by hand, no frameworks harmed</p>
+        </div>
+    </footer>
+
+    <script src="../app.js"></script>
+</body>
+
+</html>
