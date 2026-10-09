@@ -11,10 +11,10 @@
         } catch (e) { }
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Why I Built Two Go Libraries for Exchange Market Data — Abhilash Bandari</title>
+    <title>Two Formats, One Language: Decoding LZO and FAST Market Data in Pure Go — Abhilash Bandari</title>
     <meta name="description"
         content="Two Go libraries for different exchange feeds: LZO decompression on one path, FAST decoding on another, and lower CPU use in our deployment." />
-    <meta property="og:title" content="Why I Built Two Go Libraries for Exchange Market Data" />
+    <meta property="og:title" content="Two Formats, One Language: Decoding LZO and FAST Market Data in Pure Go" />
     <meta property="og:description"
         content="A Windows exchange-feed workload used about 32 CPU cores. With two Go libraries, it now uses under one core and less than 2 GB of RAM in our deployment." />
     <meta property="og:type" content="article" />
@@ -89,9 +89,9 @@
                         <li>open-source</li>
                     </ul>
                 </div>
-                <h1>Why I Built Two Go Libraries for Exchange Market Data</h1>
+                <h1>Two Formats, One Language: Decoding LZO and FAST Market Data in Pure Go</h1>
                 <p class="article-subtitle">
-                    From a Windows feed processor using about 32 CPU cores to Go feed handlers using under one.
+                    Two small decoders, the details that are easy to get almost right, and the benchmarks where C still wins.
                 </p>
             </header>
 
@@ -176,8 +176,24 @@
                     incomplete version to fail. If a caller supplies too small an output buffer, the package
                     returns an error instead of writing past it.
                 </p>
+                <p>Integration is one call into a buffer you own:</p>
+                <pre><code>import lzo1z "github.com/bandari-abhilash/LZO-GO"
+
+dst := make([]byte, 64*1024) // LZO has no length header; size it from your feed's framing
+n, err := lzo1z.Decompress(block, dst)
+if err != nil {
+	return err // truncated, corrupt, or dst too small; never a silent overrun
+}
+handle(dst[:n])</code></pre>
                 <p>
-                    The decoder makes no allocations per call. Speed still matters less to me than knowing which
+                    Go's own benchmark, <code>go test -bench . -benchmem</code> on one Apple M5 core, puts the
+                    package at roughly 2.5 to 3.2 GB/s. The garbage collector gets the day off: zero allocations per call.
+                </p>
+                <pre><code>BenchmarkDecompress/text-10        2512 ns/op   3181 MB/s   0 B/op   0 allocs/op
+BenchmarkDecompress/records-10     9327 ns/op   2487 MB/s   0 B/op   0 allocs/op
+BenchmarkDecompress/large-10      19268 ns/op   3114 MB/s   0 B/op   0 allocs/op</code></pre>
+                <p>
+                    Speed still matters less to me than knowing which
                     variant the data actually uses and getting a clear error on damaged input. Fast and wrong is just a
                     quicker way to be wrong.
                 </p>
@@ -288,6 +304,26 @@
                     <code>dec.Ctx.Reset()</code> at the packet boundary. Other feeds can carry state across
                     messages, so the feed specification decides when to reset.
                 </p>
+                <p>In code, the reset is one line, and it is the line that matters:</p>
+                <pre><code>import "github.com/bandari-abhilash/fastfix"
+
+reg, err := fastfix.LoadTemplates(templatesXML) // io.Reader with the feed's XML templates
+if err != nil {
+	return err
+}
+dec := fastfix.NewDecoder(reg)
+
+for pkt := range packets {
+	dec.Ctx.Reset() // per-packet feeds: every datagram starts fresh
+	msgs, err := dec.DecodePacket(pkt)
+	if err != nil {
+		return err
+	}
+	for _, m := range msgs {
+		px, ok := m.Int("MDEntryPx") // ok is false if absent or fractional
+		// ...
+	}
+}</code></pre>
                 <p>
                     If you keep an old value when a packet expects a fresh start, the decoder may still
                     produce a number. It just won't be the number you asked for. That is why the repository
