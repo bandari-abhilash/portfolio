@@ -8,6 +8,9 @@ I chose to write them. In our deployment, the feed-processing workload that had 
 
 The two packages are [fastfix](https://github.com/bandari-abhilash/fastfix), for decoding FAST messages, and [lzo1z](https://github.com/bandari-abhilash/LZO-GO), for LZO decompression. They're small pieces of different feed handlers, but if either gets a value wrong, everything built on top of it starts from the wrong number.
 
+- **fastfix**: FAST market data decoding in pure Go. [github.com/bandari-abhilash/fastfix](https://github.com/bandari-abhilash/fastfix) · `go get github.com/bandari-abhilash/fastfix`
+- **lzo1z**: LZO1Z decompression in pure Go. [github.com/bandari-abhilash/LZO-GO](https://github.com/bandari-abhilash/LZO-GO) · `go get github.com/bandari-abhilash/LZO-GO`
+
 ![Two separate exchange-feed paths: LZO-compressed packets go through lzo1z; FAST-encoded packets from another exchange go through fastfix.](https://bandariabhilash.com/blog/assets/exchange-feed-paths.png)
 
 *Different exchanges, different paths. The packages do not run one after the other.*
@@ -67,3 +70,5 @@ Neither package is a complete market data stack. They solve two specific problem
 If you're working with a feed that uses FAST or LZO compression, start with its specification and check which LZO variant it uses. Then look at the packages: [fastfix](https://github.com/bandari-abhilash/fastfix) and [lzo1z](https://github.com/bandari-abhilash/LZO-GO). If you have a packet they decode incorrectly, I'd especially like to see it. A real counterexample is more useful than another flattering benchmark.
 
 I used AI while building them, especially to move through implementation and documentation faster. I still had to write most of the code and check the output against reference data and tests. With market data, code that compiles is a long way from a price you can trust.
+
+Both repositories, and the rest of my work, are on GitHub: [github.com/bandari-abhilash](https://github.com/bandari-abhilash). Stars are appreciated; bug reports with real packets even more so.

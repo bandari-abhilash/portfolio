@@ -1130,6 +1130,69 @@ a:hover {
   margin-top: -0.6rem;
 }
 
+.article-body .repo-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 0 0 2rem;
+}
+
+.article-body .repo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  min-width: 0;
+  transition: border-color 0.25s var(--ease), transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+
+.article-body .repo-card:hover {
+  border-color: var(--accent-border);
+  transform: translateY(-2px);
+  box-shadow: var(--card-hover-shadow);
+}
+
+.repo-card-name {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 1.02rem;
+}
+
+.repo-card-desc {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.article-body .repo-card code {
+  display: block;
+  max-width: 100%;
+  font-size: 0.68rem;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.repo-card-cta {
+  margin-top: 0.2rem;
+  color: var(--accent);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.article-body .article-github {
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 620px) {
+  .article-body .repo-cards { grid-template-columns: 1fr; }
+}
+
 .article-body .article-callout {
   position: relative;
   margin: 2rem 0;
