@@ -1130,6 +1130,55 @@ a:hover {
   margin-top: -0.6rem;
 }
 
+.article-body .article-callout {
+  position: relative;
+  margin: 2rem 0;
+  padding: 1.1rem 1.25rem 1.1rem 1.4rem;
+  border: 1px solid var(--accent-border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent-dim);
+}
+
+.article-body .article-callout p {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 500;
+  line-height: 1.65;
+}
+
+.article-body .article-callout strong {
+  color: var(--accent);
+}
+
+.callout-balls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 4rem;
+  margin-bottom: 0.7rem;
+}
+
+.callout-balls i {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #059669;
+  animation: callout-roll 2.4s ease-in-out infinite alternate;
+}
+
+.callout-balls i:nth-child(2) { background: #0891b2; animation-duration: 1.6s; }
+.callout-balls i:nth-child(3) { background: #2563eb; animation-duration: 0.9s; }
+
+@keyframes callout-roll {
+  from { transform: translateX(0); }
+  to { transform: translateX(3.4rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .callout-balls i { animation: none; }
+}
+
 .article-body hr {
   border: 0;
   border-top: 1px solid var(--border);

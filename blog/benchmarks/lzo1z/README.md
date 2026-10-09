@@ -4,15 +4,15 @@ These harnesses compare the portfolio author's [Go LZO1Z decoder](https://github
 
 ## Results
 
-Measured on an Apple M1 MacBook Air (8 GB RAM), sequentially, with one benchmark process running at a time. Go 1.27.0; `liblzo2` 2.10; Java 20.0.2 with `lzo-core` 1.0.6. Each process warmed up for 1.5 seconds, then ran five 300 ms trials. The table reports the median. Throughput is uncompressed bytes divided by elapsed time, in decimal GB/s. The processes were single-threaded but not pinned to a specific core.
+Measured on an Apple M5 Mac (24 GB RAM), sequentially, with one benchmark process running at a time. Go 1.26.3; `liblzo2` 2.10 (Homebrew, `cc -O2`); Java 17.0.19 (OpenJDK) with `lzo-core` 1.0.6. Each process warmed up for 1.5 seconds, then ran five 300 ms trials. The table reports the median. Throughput is uncompressed bytes divided by elapsed time, in decimal GB/s. The processes were single-threaded but not pinned to a specific core.
 
 | Original data | Size | Go ns/call | Go GB/s | Java ns/call | Java GB/s | C ns/call | C GB/s |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `text` | 7,991 B | 3,959.74 | 2.018 | 1,578.60 | 5.062 | 715.67 | 11.166 |
-| `records` | 23,200 B | 15,514.17 | 1.495 | 10,806.29 | 2.147 | 3,944.16 | 5.882 |
-| `large` | 60,000 B | 29,956.12 | 2.003 | 13,082.82 | 4.586 | 3,797.80 | 15.799 |
+| `text` | 7,991 B | 2,540.32 | 3.146 | 1,049.81 | 7.612 | 369.99 | 21.598 |
+| `records` | 23,200 B | 9,527.41 | 2.435 | 6,206.98 | 3.738 | 2,525.48 | 9.186 |
+| `large` | 60,000 B | 19,645.90 | 3.054 | 8,479.84 | 7.076 | 2,576.96 | 23.283 |
 
-The three inputs have different compression patterns, so throughput changes substantially by input. These numbers describe this machine, decoder versions, and harnesses; they are not a general ranking of Go, Java, and C. The Go repository's README contains separate Go-only benchmark results from a different run.
+The three inputs have different compression patterns, so throughput changes substantially by input. These numbers describe this machine, decoder versions, and harnesses; they are not a general ranking of Go, Java, and C.
 
 ## Reproduce
 

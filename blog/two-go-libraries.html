@@ -50,12 +50,12 @@
             </div>
             <div class="nav-actions">
                 <button class="theme-toggle" id="theme-toggle" aria-label="Switch between light and dark mode">
-                    <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
-                    <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
                         <line x1="12" y1="1" x2="12" y2="3"></line>
                         <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -125,7 +125,8 @@
                         <img src="assets/exchange-feed-paths.png" width="1400" height="650"
                             alt="Two separate exchange-feed paths. An LZO-compressed packet goes through lzo1z and becomes uncompressed feed bytes. A FAST-encoded packet from another exchange goes through fastfix and becomes decoded fields." />
                     </a>
-                    <figcaption>Different exchanges, different paths. The packages do not run one after the other.</figcaption>
+                    <figcaption>Different exchanges, different paths. The packages do not run one after the other.
+                    </figcaption>
                 </figure>
                 <h2>The gap I kept running into</h2>
                 <p>
@@ -138,11 +139,13 @@
                     On the LZO feed, decompression unpacks a block before the message can be read. This
                     package handles the LZO1Z variant. It is easy to mistake
                     that for the better known LZO1X variant because the formats are closely related. They
-                    are not interchangeable. A decoder can even return plausible looking bytes that are wrong.
+                    are not interchangeable. A decoder can even return plausible looking bytes that are wrong, which is
+                    the worst kind of wrong: the confident kind.
                 </p>
                 <p>
                     Both packages use only the Go standard library. I can inspect the decoding path, test it
-                    against encoded data, and build the feed handlers without a C library in the toolchain.
+                    against encoded data, and build the feed handlers without a C library in the toolchain. Fewer moving
+                    parts, fewer surprises during market hours, when customers are watching every tick.
                 </p>
 
                 <h2>Getting LZO decompression right</h2>
@@ -160,29 +163,57 @@
                     returns an error instead of writing past it.
                 </p>
                 <p>
-                    The README's sample benchmarks report roughly 1.6 to 2.1 GB/s on an M-series Mac,
-                    with no allocations per call. Those numbers matter less to me than knowing which
-                    variant the data actually uses and getting a clear error on damaged input.
+                    The decoder makes no allocations per call. Speed still matters less to me than knowing which
+                    variant the data actually uses and getting a clear error on damaged input. Fast and wrong is just a
+                    quicker way to be wrong.
                 </p>
                 <p>
-                    I also ran the same LZO1Z blocks through three decoders on an Apple M1:
+                    I also ran the same LZO1Z blocks through three decoders on an Apple M5:
                     this Go package, Java's lzo-java, and C's liblzo2. Each harness checked the
                     complete decompressed output against the original bytes before timing. Higher
-                    throughput is faster.
+                    throughput is faster. Spoiler: Go did not win this one.
                 </p>
                 <div class="benchmark-table-wrap">
                     <table class="benchmark-table">
                         <caption>LZO1Z decompression throughput, GB/s</caption>
                         <thead>
-                            <tr><th scope="col">Input</th><th scope="col">Go lzo1z</th><th scope="col">Java lzo-java</th><th scope="col">C liblzo2</th></tr>
+                            <tr>
+                                <th scope="col">Input</th>
+                                <th scope="col">Go lzo1z</th>
+                                <th scope="col">Java lzo-java</th>
+                                <th scope="col">C liblzo2</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><th scope="row">Text · 7,991 B</th><td>2.02</td><td>5.06</td><td>11.17</td></tr>
-                            <tr><th scope="row">Records · 23,200 B</th><td>1.50</td><td>2.15</td><td>5.88</td></tr>
-                            <tr><th scope="row">Large · 60,000 B</th><td>2.00</td><td>4.59</td><td>15.80</td></tr>
+                            <tr>
+                                <th scope="row">Text · 7,991 B</th>
+                                <td>3.15</td>
+                                <td>7.61</td>
+                                <td>21.60</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Records · 23,200 B</th>
+                                <td>2.44</td>
+                                <td>3.74</td>
+                                <td>9.19</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Large · 60,000 B</th>
+                                <td>3.05</td>
+                                <td>7.08</td>
+                                <td>23.28</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
+                <aside class="article-callout">
+                    <span class="callout-balls" aria-hidden="true"><i></i><i></i><i></i></span>
+                    <p>
+                        Tables are fine, but tech Twitter has recently agreed that the only honest way to judge
+                        performance is to watch balls go left to right. Who am I to argue with a consensus?
+                        So I added some balls. <strong>Same numbers, more drama.</strong>
+                    </p>
+                </aside>
                 <section class="benchmark-race" data-race-kind="throughput"
                     aria-label="LZO1Z records decompression throughput animation">
                     <div class="race-heading">
@@ -192,34 +223,48 @@
                         </div>
                         <button class="race-replay" type="button">Replay</button>
                     </div>
-                    <div class="race-row" data-value="5.882">
-                        <div class="race-label"><strong>C liblzo2</strong><span>5.88 GB/s</span></div>
+                    <div class="race-row" data-value="9.186">
+                        <div class="race-label"><strong>C liblzo2</strong><span>9.19 GB/s</span></div>
                         <div class="race-track"><span class="race-ball race-ball--blue" aria-hidden="true"></span></div>
                     </div>
-                    <div class="race-row" data-value="2.147">
-                        <div class="race-label"><strong>Java lzo-java</strong><span>2.15 GB/s</span></div>
+                    <div class="race-row" data-value="3.738">
+                        <div class="race-label"><strong>Java lzo-java</strong><span>3.74 GB/s</span></div>
                         <div class="race-track"><span class="race-ball race-ball--cyan" aria-hidden="true"></span></div>
                     </div>
-                    <div class="race-row" data-value="1.495">
-                        <div class="race-label"><strong>Go lzo1z</strong><span>1.50 GB/s</span></div>
-                        <div class="race-track"><span class="race-ball race-ball--green" aria-hidden="true"></span></div>
+                    <div class="race-row" data-value="2.435">
+                        <div class="race-label"><strong>Go lzo1z</strong><span>2.44 GB/s</span></div>
+                        <div class="race-track"><span class="race-ball race-ball--green" aria-hidden="true"></span>
+                        </div>
                     </div>
-                    <p class="race-note">Equal work per trip; higher throughput makes each trip shorter. Playback is slowed down for comparison.</p>
+                    <p class="race-note">Equal work per trip; higher throughput makes each trip shorter. Playback is
+                        slowed down for comparison.</p>
                 </section>
                 <p>
                     These are medians of five 300 ms timed runs per decoder, after a 1.5-second warm-up,
                     using preallocated output buffers and the repository's test vectors. The C and Java
-                    harnesses used their safe LZO1Z decoders. On this machine, C was about 3.9 times as
-                    fast as Go on the records block; Java was about 1.4 times as fast. The result depends
+                    harnesses used their safe LZO1Z decoders. On this machine, C was about 3.8 times as
+                    fast as Go on the records block; Java was about 1.5 times as fast. The result depends
                     on the input and runtime, as the other two rows show. The
                     <a href="benchmarks/lzo1z/README.md">harnesses and exact measurements</a> are available
                     for inspection.
                 </p>
                 <p>
+                    Before anyone files Go under “slow”: it doesn't have to be this far behind. The package is still a
+                    direct, untuned
+                    port of the C decoder. A CPU profile showed about 70% of its time going to one loop that copies
+                    each back-reference one byte at a time, which is roughly like moving house one spoon per trip.
+                    liblzo2 copies those 4 or 8 bytes at a time when it can.
+                    Chunked copies and fewer bounds checks are next on the
+                    <a href="https://github.com/bandari-abhilash/LZO-GO#todo-performance-work" target="_blank"
+                        rel="noopener">package's to-do list</a>,
+                    and I'll update these numbers when they land.
+                </p>
+                <p>
                     There is a licensing constraint worth seeing before adoption: this port is
-                    <a href="https://github.com/bandari-abhilash/LZO-GO/blob/master/LICENSE" target="_blank" rel="noopener">GPL-2.0-or-later</a>
+                    <a href="https://github.com/bandari-abhilash/LZO-GO/blob/master/LICENSE" target="_blank"
+                        rel="noopener">GPL-2.0-or-later</a>
                     because it derives from the original LZO code. Check whether that license fits how you
-                    plan to distribute your software.
+                    plan to distribute your software. Better to read it now than to have a lawyer read it to you later.
                 </p>
 
                 <h2>The FAST detail that can quietly change a price</h2>
@@ -247,7 +292,8 @@
                     The package loads FAST templates at runtime and decodes common field types, groups, and
                     sequences. It can also encode some session messages. Encoding is not yet complete for
                     every FAST operator or structure; the
-                    <a href="https://github.com/bandari-abhilash/fastfix#not-implemented" target="_blank" rel="noopener">README lists the gaps</a>.
+                    <a href="https://github.com/bandari-abhilash/fastfix#not-implemented" target="_blank"
+                        rel="noopener">known gaps are listed</a>.
                 </p>
 
                 <h2>The benchmark, including the part where C++ wins</h2>
@@ -260,12 +306,12 @@
                     mFAST in C++ took 0.27 microseconds with generated code, or 0.67 microseconds with
                     runtime templates. That's roughly 4 to 9 times as fast as fastfix on this packet.
                 </p>
-                <section class="benchmark-race" data-race-kind="latency"
-                    aria-label="FAST decoder benchmark animation">
+                <section class="benchmark-race" data-race-kind="latency" aria-label="FAST decoder benchmark animation">
                     <div class="race-heading">
                         <div>
                             <h3>FAST decoder balls</h3>
-                            <p>Each trip represents one decode of the same packet. Lower time means faster back-and-forth motion.</p>
+                            <p>Each trip represents one decode of the same packet. Lower time means faster
+                                back-and-forth motion.</p>
                         </div>
                         <button class="race-replay" type="button">Replay</button>
                     </div>
@@ -279,25 +325,32 @@
                     </div>
                     <div class="race-row" data-value="2.41">
                         <div class="race-label"><strong>OpenFAST · Java</strong><span>2.41 µs</span></div>
-                        <div class="race-track"><span class="race-ball race-ball--slate" aria-hidden="true"></span></div>
+                        <div class="race-track"><span class="race-ball race-ball--slate" aria-hidden="true"></span>
+                        </div>
                     </div>
                     <div class="race-row" data-value="2.55">
                         <div class="race-label"><strong>fastfix · Go</strong><span>2.55 µs</span></div>
-                        <div class="race-track"><span class="race-ball race-ball--green" aria-hidden="true"></span></div>
+                        <div class="race-track"><span class="race-ball race-ball--green" aria-hidden="true"></span>
+                        </div>
                     </div>
                     <div class="race-row" data-value="2.92">
-                        <div class="race-label"><strong>goFAST hand-written · Go</strong><span>2.92 µs</span></div>
+                        <div class="race-label"><strong>goFAST · Go</strong><span>2.92 µs</span></div>
                         <div class="race-track"><span class="race-ball race-ball--gray" aria-hidden="true"></span></div>
                     </div>
-                    <p class="race-note">Measured on one Apple M5 core. Motion is slowed down; the values above are the benchmark results. Inspired by <a href="https://x.com/BenjDicken/status/1901659382007451954?s=20" target="_blank" rel="noopener">Ben Dicken's language balls</a>.</p>
+                    <p class="race-note">Measured on one Apple M5 core. Motion is slowed down; the values above are the
+                        benchmark results. Inspired by <a
+                            href="https://x.com/BenjDicken/status/1901659382007451954?s=20" target="_blank"
+                            rel="noopener">Ben Dicken's language balls</a>.</p>
                 </section>
                 <p>
                     That is one workload, so treat it as a comparison of this packet and these harnesses.
                     The harnesses and conditions are in the
-                    <a href="https://github.com/bandari-abhilash/fastfix/tree/master/benchmarks" target="_blank" rel="noopener">benchmark directory</a>
+                    <a href="https://github.com/bandari-abhilash/fastfix/tree/master/benchmarks" target="_blank"
+                        rel="noopener">benchmark directory</a>
                     so the comparison can be examined and repeated. The result gave me a useful next task:
                     fastfix currently builds fresh maps for decoded messages, allocating about 5.3 KB per
-                    packet in this test. I'm working on reducing those allocations now. There is room to
+                    packet in this test, which keeps the garbage collector busier than I'd like. I'm working on reducing
+                    those allocations now. There is room to
                     make fastfix faster, especially when several feeds are running at once; the C++ result
                     gives me a useful target, not a speedup I can promise yet.
                 </p>
@@ -319,7 +372,8 @@
                 </p>
                 <p>
                     I used AI while building them, especially to move through implementation and
-                    documentation faster. I still had to check the output against reference data and tests.
+                    documentation faster. I still had to write most of the code and check the output against reference
+                    data and tests.
                     With market data, code that compiles is a long way from a price you can trust.
                 </p>
             </div>
