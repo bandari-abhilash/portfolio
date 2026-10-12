@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <script>
+        /* Apply saved theme before first paint to avoid a flash */
+        try {
+            var t = localStorage.getItem("theme");
+            if (t === "dark" || t === "light") document.documentElement.dataset.theme = t;
+        } catch (e) { }
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Every App Has an Address: A Keyboard-Driven Mac for Production Incidents — Abhilash Bandari</title>
+    <meta name="description"
+        content="A tiling window manager and a quiet status bar that make a MacBook faster to drive on production incident calls, and what it took to make the setup work on every MacBook." />
+    <meta property="og:title" content="Every App Has an Address: A Keyboard-Driven Mac for Production Incidents" />
+    <meta property="og:description"
+        content="One keystroke to any app, no overlapping windows on a shared screen, and a setup that works on notched, non-notch and Intel MacBooks." />
+    <meta property="og:type" content="article" />
+    <meta property="og:image" content="https://bandariabhilash.com/blog/assets/tiling-workspace-map.png" />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="../style.css" />
+</head>
+
+<body>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <span class="logo-mark">ab</span><span class="logo-cursor">_</span>
+            </a>
+            <div class="nav-menu" id="nav-menu">
+                <a href="../index.html#about" class="nav-link">About</a>
+                <a href="../index.html#experience" class="nav-link">Experience</a>
+                <a href="../index.html#projects" class="nav-link">Projects</a>
+                <a href="../index.html#blog" class="nav-link">Blog</a>
+                <a href="../index.html#contact" class="nav-link">Contact</a>
+                <a href="../AbhilashBandari-Resume.pdf" target="_blank"
+                    class="btn btn--outline btn--sm nav-resume">Resume</a>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Switch between light and dark mode">
+                    <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="article">
+        <div class="article-container">
+            <a class="article-back" href="../index.html#blog">← All writing</a>
+
+            <header class="article-header">
+                <div class="blog-meta">
+                    <time datetime="2026-10-12">Oct 12, 2026</time>
+                    <ul class="tags tags--sm">
+                        <li>macos</li>
+                        <li>productivity</li>
+                        <li>dotfiles</li>
+                    </ul>
+                </div>
+                <h1>Every App Has an Address: A Keyboard-Driven Mac for Production Incidents</h1>
+                <p class="article-subtitle">
+                    A tiling window manager, a status bar that actually helps, and why it matters most when
+                    the whole team is watching your shared screen.
+                </p>
+            </header>
+
+            <div class="article-body">
+                <p>
+                    If you've been on a production incident call, you know the moment. Someone says
+                    “can you pull up the error rate?” and you're sharing your screen. You press
+                    <code>⌘ Tab</code> a few times, land on the wrong browser, open Mission Control,
+                    squint at fourteen thumbnails, and finally find the dashboard behind a Slack window.
+                    It takes maybe ten seconds. It feels like a minute, because six people watched
+                    you do it.
+                </p>
+                <p>
+                    The time matters less than the attention. On an incident call, your attention
+                    belongs to the problem: what changed, what's failing, and what to try next.
+                    Every moment spent finding a window is a moment not spent on any of that.
+                </p>
+                <p>
+                    So I set up my Mac so I never have to look for a window. Every app has a fixed
+                    place, every place is one keystroke away, and nothing overlaps. This post walks
+                    through the setup, shows it on a mock incident, and covers what it took to make it
+                    behave on every MacBook, not only mine.
+                </p>
+
+                <div class="repo-cards">
+                    <a class="repo-card" href="https://github.com/bandari-abhilash/dotfiles" target="_blank" rel="noopener">
+                        <span class="repo-card-name">dotfiles</span>
+                        <span class="repo-card-desc">AeroSpace + SketchyBar, one installer, rollback on failure</span>
+                        <code>git clone https://github.com/bandari-abhilash/dotfiles</code>
+                        <span class="repo-card-cta">View on GitHub →</span>
+                    </a>
+                </div>
+
+                <h2>What the setup is</h2>
+                <p>
+                    There are two pieces, both free and open source:
+                </p>
+                <p>
+                    <a href="https://github.com/nikitabobko/AeroSpace" target="_blank" rel="noopener">AeroSpace</a>
+                    is a tiling window manager. Windows don't float around; they split the screen
+                    between them automatically. You move between them, and between workspaces, with the
+                    keyboard. It also launches my most-used apps from hotkeys, so there's no separate
+                    hotkey daemon to install or give permissions to.
+                </p>
+                <p>
+                    <a href="https://github.com/FelixKratz/SketchyBar" target="_blank" rel="noopener">SketchyBar</a>
+                    replaces the macOS menu bar with one I can configure. It shows the workspaces, which apps are
+                    on each one, and the current app. Battery, volume and Wi-Fi sit on the right.
+                </p>
+                <p>
+                    A single <code>install.sh</code> installs both with Homebrew, links the configs into
+                    <code>~/.config</code> with GNU Stow, and undoes everything if any step fails.
+                </p>
+
+                <h2>Every app has an address</h2>
+                <p>
+                    Most of the speed comes from one simple rule: each app always opens on the same
+                    workspace. Terminal goes to 1, Arc to 2, Brave to 3, Slack to 4, Postman to 7. It
+                    doesn't matter how I open the app; AeroSpace sees the new window and moves it.
+                </p>
+                <figure class="article-figure">
+                    <a href="assets/tiling-workspace-map.png" target="_blank" rel="noopener">
+                        <img src="assets/tiling-workspace-map.png" width="1400" height="650"
+                            alt="Workspaces 1 to 7. Terminal is on 1, Arc on 2, Brave on 3, Slack on 4, and Postman on 7; 5 and 6 are free. Option plus a number goes to a workspace, Option Shift plus a number sends the window there, Option Tab goes back, Option H J K L moves focus, Option slash flips the split, and Option Shift Tab moves the workspace to the other monitor." />
+                    </a>
+                    <figcaption>The whole map. Workspaces 5 and 6 stay free for whatever an incident needs.</figcaption>
+                </figure>
+                <p>
+                    Because the places never change, you stop thinking about them. After a while,
+                    “show the logs” becomes <code>⌥ 1</code> without any decision in between. That is
+                    the difference from <code>⌘ Tab</code>: its order depends on what you used last,
+                    so you have to look every time.
+                </p>
+                <p>Try it here. Click the demo (or tab to it), then press <code>⌥ 1</code> to <code>⌥ 7</code>:</p>
+
+                <section class="ws-demo" tabindex="0" aria-label="Interactive workspace demo">
+                    <div class="race-heading">
+                        <div>
+                            <h3>A mock incident, keyboard only</h3>
+                            <p>Each workspace holds one part of the investigation.</p>
+                        </div>
+                        <button class="race-replay ws-tour" type="button">Play tour</button>
+                    </div>
+                    <div class="ws-screen">
+                        <div class="ws-bar" aria-hidden="true">
+                            <div class="ws-pills">
+                                <span class="ws-pill" data-ws="1">1</span>
+                                <span class="ws-pill" data-ws="2">2</span>
+                                <span class="ws-pill" data-ws="3">3</span>
+                                <span class="ws-pill" data-ws="4">4</span>
+                                <span class="ws-pill" data-ws="5">5</span>
+                                <span class="ws-pill" data-ws="6">6</span>
+                                <span class="ws-pill" data-ws="7">7</span>
+                            </div>
+                            <span class="ws-front-app">Terminal</span>
+                            <span class="ws-bar-right">Mon 12. Oct 21:04</span>
+                        </div>
+                        <div class="ws-desk">
+                            <div class="ws-pane" data-ws="1" data-app="Terminal">
+                                <div class="ws-win">
+                                    <div class="ws-win-title">checkout-api · logs</div>
+                                    <div class="ws-win-body">
+                                        <div><span class="dim">21:03:58</span> <span class="ok">INFO</span>  200 GET /api/cart 31ms</div>
+                                        <div><span class="dim">21:03:59</span> <span class="warn">WARN</span>  200 GET /api/orders 712ms</div>
+                                        <div><span class="dim">21:04:00</span> <span class="err">ERROR</span> 503 POST /api/checkout</div>
+                                        <div><span class="dim">21:04:00</span> <span class="err">ERROR</span> payments-db pool exhausted</div>
+                                        <div><span class="dim">21:04:01</span> <span class="err">ERROR</span> 503 POST /api/payments</div>
+                                        <div><span class="dim">21:04:02</span> <span class="warn">WARN</span>  200 GET /api/cart 655ms</div>
+                                    </div>
+                                </div>
+                                <div class="ws-win">
+                                    <div class="ws-win-title">checkout-api · metrics</div>
+                                    <div class="ws-win-body">
+                                        <div>requests/s   640</div>
+                                        <div>error rate   <span class="err">23%</span></div>
+                                        <div>p99 latency  <span class="err">2.8s</span></div>
+                                        <div><span class="err">● ALERT</span> error rate &gt; 5%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ws-pane is-single" data-ws="2" data-app="Arc" hidden>
+                                <div class="ws-win">
+                                    <div class="ws-win-title">Grafana · checkout overview</div>
+                                    <div class="ws-win-body">
+                                        <div>5xx responses, last 30 min</div>
+                                        <div class="ws-chart" aria-hidden="true">
+                                            <span style="height:8%"></span><span style="height:10%"></span>
+                                            <span style="height:7%"></span><span style="height:9%"></span>
+                                            <span style="height:8%"></span><span style="height:11%"></span>
+                                            <span class="err" style="height:55%"></span><span class="err" style="height:80%"></span>
+                                            <span class="err" style="height:92%"></span><span class="err" style="height:86%"></span>
+                                            <span class="err" style="height:90%"></span><span class="err" style="height:88%"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ws-pane is-single" data-ws="3" data-app="Brave Browser" hidden>
+                                <div class="ws-win">
+                                    <div class="ws-win-title">Runbook · checkout-api</div>
+                                    <div class="ws-win-body">
+                                        <div>1. Check the deploy log for the last release</div>
+                                        <div>2. Check the payments-db connection pool</div>
+                                        <div>3. If the release is suspect: roll back</div>
+                                        <div class="dim">   kubectl rollout undo deploy/checkout-api</div>
+                                        <div>4. Post status in #incident every 15 min</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ws-pane is-single" data-ws="4" data-app="Slack" hidden>
+                                <div class="ws-win">
+                                    <div class="ws-win-title">#incident-checkout</div>
+                                    <div class="ws-win-body">
+                                        <div><span class="warn">on-call</span>  error rate on checkout at 23%</div>
+                                        <div><span class="warn">on-call</span>  v2.14.1 went out 12 min ago</div>
+                                        <div><span class="ok">lead</span>     agreed, roll it back</div>
+                                        <div><span class="warn">on-call</span>  rolling back now</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ws-pane is-single" data-ws="5" data-app="" hidden></div>
+                            <div class="ws-pane is-single" data-ws="6" data-app="" hidden></div>
+                            <div class="ws-pane is-single" data-ws="7" data-app="Postman" hidden>
+                                <div class="ws-win">
+                                    <div class="ws-win-title">Postman · POST /api/checkout</div>
+                                    <div class="ws-win-body">
+                                        <div><span class="err">503 Service Unavailable</span>  2.91 s</div>
+                                        <div class="dim">{ "error": "upstream timeout" }</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="ws-hint ws-status" aria-live="polite">Press ⌥ 1–7 or click a key below.</p>
+                    <div class="ws-keys">
+                        <button class="ws-key" type="button" data-key="1">⌥ 1</button>
+                        <button class="ws-key" type="button" data-key="2">⌥ 2</button>
+                        <button class="ws-key" type="button" data-key="3">⌥ 3</button>
+                        <button class="ws-key" type="button" data-key="4">⌥ 4</button>
+                        <button class="ws-key" type="button" data-key="7">⌥ 7</button>
+                        <button class="ws-key" type="button" data-key="tab">⌥ Tab</button>
+                        <button class="ws-key" type="button" data-key="/">⌥ /</button>
+                    </div>
+                </section>
+
+                <h2>What it looks like on a call</h2>
+                <p>
+                    Here is the real thing: a mock incident on my machine, recorded with a script that
+                    runs the same AeroSpace commands the shortcuts trigger. The caption in the bar shows
+                    which key each step stands for. Logs and metrics are synthetic; I'm not putting a
+                    real incident on the internet.
+                </p>
+                <figure class="article-figure">
+                    <video controls muted playsinline preload="metadata" width="1920" height="1080"
+                        style="width:100%;height:auto;border-radius:var(--radius-sm)"
+                        src="assets/aerospace-demo.mp4">
+                        <a href="assets/aerospace-demo.mp4">Download the demo video</a>
+                    </video>
+                    <figcaption>About thirty seconds of an incident without the mouse: logs, metrics, dashboards, runbook, and back.</figcaption>
+                </figure>
+                <p>A few things that help most when other people are watching:</p>
+                <p>
+                    <strong>Nothing overlaps.</strong> Tiled windows can't hide behind each other, so
+                    when you share your screen, everyone sees the whole log and the whole graph. No
+                    one has to say “scroll up, it's behind the other window”.
+                </p>
+                <p>
+                    <strong>Splits follow the conversation.</strong> Logs and metrics share workspace 1.
+                    When a line in the logs needs to be wider, <code>⌥ /</code> stacks them instead of
+                    putting them side by side. Press it again to go back.
+                </p>
+                <p>
+                    <strong>Going back is one key.</strong> <code>⌥ Tab</code> returns to the previous
+                    workspace. The most common move on a call is checking the chat and returning to the
+                    dashboard, and that is now two key presses with no looking.
+                </p>
+                <p>
+                    <strong>Presenting is one key too.</strong> <code>⌥ ⇧ Tab</code> sends the current
+                    workspace to the other monitor, so the dashboard you're explaining can go on the big
+                    screen while the terminal stays on the laptop.
+                </p>
+
+                <h2>The bar is part of it</h2>
+                <p>
+                    AeroSpace and SketchyBar are separate programs, so they need a way to talk. When the
+                    workspace changes, AeroSpace runs a small command that tells SketchyBar, which then
+                    highlights the new workspace and updates the app icons for each one.
+                </p>
+                <figure class="article-figure">
+                    <a href="assets/tiling-keystroke-flow.png" target="_blank" rel="noopener">
+                        <img src="assets/tiling-keystroke-flow.png" width="1400" height="650"
+                            alt="Pressing Option 2 makes AeroSpace show workspace 2, tiled, and SketchyBar then highlights workspace 2. Separately, opening Slack from anywhere triggers an AeroSpace rule that puts it on workspace 4." />
+                    </a>
+                    <figcaption>One keystroke from start to finish, and how a window rule keeps each app in its place.</figcaption>
+                </figure>
+                <p>
+                    The bar also stays quiet unless something needs you. The battery icon only appears
+                    below 60%, and Wi-Fi turns grey when you're offline. During an incident, the
+                    last thing I need is a status bar asking for attention it doesn't deserve.
+                </p>
+
+                <h2>Making it work on every MacBook</h2>
+                <p>
+                    My first version worked on exactly one laptop: mine. Getting it to work across the
+                    MacBook range took more work than writing it did.
+                </p>
+                <p>
+                    <strong>The notch.</strong> MacBooks with a notch keep a strip at the top of the
+                    screen that windows can't use. MacBooks without one, and external monitors, don't.
+                    One fixed gap either hid windows under the bar on one display or left an empty band on the other.
+                    AeroSpace allows a different gap for each monitor, so the built-in display and
+                    external monitors now get their own values. The installer checks whether your MacBook
+                    has a notch and tells you if you need to change one number.
+                </p>
+                <p>
+                    <strong>Intel and Apple Silicon.</strong> Homebrew installs to
+                    <code>/opt/homebrew</code> on Apple Silicon and <code>/usr/local</code> on Intel.
+                    Apps opened from Finder also get a minimal <code>PATH</code>, so AeroSpace now adds
+                    both locations itself instead of assuming one.
+                </p>
+                <p>
+                    <strong>Wi-Fi names.</strong> Since macOS 14.4, scripts without Location Services
+                    access can't read the Wi-Fi network name. The old approach reported you as
+                    disconnected while you were online. The bar now goes by whether you have an IP
+                    address and finds the Wi-Fi interface instead of assuming <code>en0</code>.
+                </p>
+                <p>
+                    <strong>The bar was leaking processes.</strong> While testing, I found
+                    <strong>525 stuck processes</strong> on my own machine. Every app switch made each of the
+                    seven workspace items ask AeroSpace for its windows, and now and then the call
+                    never returned. A productivity setup with a process leak is a special kind of
+                    irony. Now one script updates all seven items with one query, the query has a
+                    two-second timeout, and only one update can run at a time.
+                </p>
+
+                <h2>What it costs</h2>
+                <p>It isn't free, and I'd rather say so up front:</p>
+                <p>
+                    <strong>The first few days are slower.</strong> Your hands still reach for the mouse
+                    and <code>⌘ Tab</code>. It's worth practising on a quiet day, not discovering
+                    the shortcuts during an outage.
+                </p>
+                <p>
+                    <strong>Option is taken.</strong> On German, Nordic and some other keyboard layouts,
+                    <code>⌥</code> plus a letter types characters like <code>@</code> and <code>[</code>.
+                    If you need those, change the modifier for the keys you type with.
+                </p>
+                <p>
+                    <strong>Some apps don't like tiling.</strong> Small dialogs and some settings windows
+                    look odd when tiled. <code>⌥ ⇧ Space</code> lets a window float.
+                </p>
+                <p>
+                    <strong>Permissions and versions.</strong> AeroSpace needs Accessibility access and
+                    macOS 13 or newer.
+                </p>
+
+                <h2>Try it</h2>
+                <pre><code>git clone https://github.com/bandari-abhilash/dotfiles.git
+cd dotfiles
+./install.sh</code></pre>
+                <p>
+                    The installer tells you what it's doing, pauses at the one step that needs you
+                    (the Accessibility permission), and rolls everything back if a step fails.
+                    <code>./uninstall.sh</code> removes it all again. Change the app list in
+                    <code>aerospace.toml</code> to match your own: the specific apps matter less than
+                    each one having a fixed place.
+                </p>
+                <p>
+                    None of this will fix an outage for you. What it can do is make sure that, while
+                    you're fixing one, your laptop isn't one more thing in the way.
+                </p>
+                <p class="article-github">
+                    The configs, the installer and the demo recording script are all on GitHub:
+                    <a href="https://github.com/bandari-abhilash/dotfiles" target="_blank" rel="noopener">github.com/bandari-abhilash/dotfiles</a>.
+                    If it breaks on your Mac, open an issue and include your model. That's exactly the
+                    kind of bug I want to hear about.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 Abhilash Bandari · Built by hand, no frameworks harmed</p>
+        </div>
+    </footer>
+
+    <script src="../app.js"></script>
+    <script src="workspace-demo.js"></script>
+</body>
+
+</html>
