@@ -55,8 +55,8 @@ document.querySelectorAll(".ws-demo").forEach((demo) => {
     demo.classList.remove("is-touring");
   };
 
-  // Same sequence as the recorded video: logs, metrics split, dashboards, runbook, chat, back
-  const tour = ["1", "/", "/", "2", "3", "4", "tab", "1"];
+  // Same order as the recorded video: logs, split flip, every app's workspace, back, logs
+  const tour = ["1", "/", "/", "2", "3", "4", "7", "tab", "1"];
   const playTour = () => {
     stopTour();
     demo.classList.add("is-touring");

@@ -34,19 +34,21 @@ Because the places never change, you stop thinking about them. After a while, "s
 
 ## What it looks like on a call
 
-Here is the real thing: a mock incident on my machine, recorded with a script that runs the same AeroSpace commands the shortcuts trigger. The caption in the bar shows which key each step stands for. Logs and metrics are synthetic; I'm not putting a real incident on the internet.
+Here is the real thing: a mock incident on my machine, recorded with a script that runs the same commands the shortcuts trigger. Before each step, a banner under the bar shows the keys being pressed. The logs, metrics and deploy history are synthetic; I'm not putting a real incident on the internet.
 
 [VIDEO: paste the YouTube link here on its own line; Medium turns it into an embedded player]
 
-*About thirty seconds of an incident without the mouse: logs, metrics, dashboards, runbook, and back.*
+*About seventy-five seconds of an incident without the mouse: moving between panes, stacking and overlapping them, every app's workspace, the app launchers, and back to the logs after the rollback.*
 
 A few things that help most when other people are watching:
 
 **Nothing overlaps.** Tiled windows can't hide behind each other, so when you share your screen, everyone sees the whole log and the whole graph. No one has to say "scroll up, it's behind the other window".
 
-**Splits follow the conversation.** Logs and metrics share workspace 1. When a line in the logs needs to be wider, `⌥ /` stacks them instead of putting them side by side. Press it again to go back.
+**Splits follow the conversation.** Logs, metrics and deploy history share workspace 1, and `⌥ H/J/K/L` moves between them. When a line in the logs needs to be wider, `⌥ /` stacks them instead of putting them side by side. When you only want one at a time, `⌥ ,` overlaps them and the same keys flip through the stack.
 
 **Going back is one key.** `⌥ Tab` returns to the previous workspace. The most common move on a call is checking the chat and returning to the dashboard, and that is now two key presses with no looking.
+
+**Apps are one key away.** `⌥ A`, `⌥ B`, `⌥ S` and `⌥ P` open Arc, Brave, Slack and Postman from anywhere, and the window rules take you straight to their workspace.
 
 **Presenting is one key too.** `⌥ ⇧ Tab` sends the current workspace to the other monitor, so the dashboard you're explaining can go on the big screen while the terminal stays on the laptop.
 
