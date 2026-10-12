@@ -280,17 +280,17 @@
                 <h2>What it looks like on a call</h2>
                 <p>
                     Here is the real thing: a mock incident on my machine, recorded with a script that
-                    runs the same AeroSpace commands the shortcuts trigger. The caption in the bar shows
-                    which key each step stands for. Logs and metrics are synthetic; I'm not putting a
-                    real incident on the internet.
+                    runs the same commands the shortcuts trigger. Before each step, a banner under the
+                    bar shows the keys being pressed. The logs, metrics and deploy history are synthetic;
+                    I'm not putting a real incident on the internet.
                 </p>
                 <figure class="article-figure">
-                    <video controls muted playsinline preload="metadata" width="1920" height="1080"
+                    <video controls muted playsinline preload="metadata" width="1920" height="1248"
                         style="width:100%;height:auto;border-radius:var(--radius-sm)"
                         src="assets/aerospace-demo.mp4">
                         <a href="assets/aerospace-demo.mp4">Download the demo video</a>
                     </video>
-                    <figcaption>About thirty seconds of an incident without the mouse: logs, metrics, dashboards, runbook, and back.</figcaption>
+                    <figcaption>About seventy-five seconds of an incident without the mouse: moving between panes, stacking and overlapping them, every app’s workspace, the app launchers, and back to the logs after the rollback.</figcaption>
                 </figure>
                 <p>A few things that help most when other people are watching:</p>
                 <p>
@@ -299,14 +299,21 @@
                     one has to say “scroll up, it's behind the other window”.
                 </p>
                 <p>
-                    <strong>Splits follow the conversation.</strong> Logs and metrics share workspace 1.
-                    When a line in the logs needs to be wider, <code>⌥ /</code> stacks them instead of
-                    putting them side by side. Press it again to go back.
+                    <strong>Splits follow the conversation.</strong> Logs, metrics and deploy history
+                    share workspace 1, and <code>⌥ H/J/K/L</code> moves between them. When a line in the
+                    logs needs to be wider, <code>⌥ /</code> stacks them instead of putting them side by
+                    side. When you only want one at a time, <code>⌥ ,</code> overlaps them and the same
+                    keys flip through the stack.
                 </p>
                 <p>
                     <strong>Going back is one key.</strong> <code>⌥ Tab</code> returns to the previous
                     workspace. The most common move on a call is checking the chat and returning to the
                     dashboard, and that is now two key presses with no looking.
+                </p>
+                <p>
+                    <strong>Apps are one key away.</strong> <code>⌥ A</code>, <code>⌥ B</code>,
+                    <code>⌥ S</code> and <code>⌥ P</code> open Arc, Brave, Slack and Postman from
+                    anywhere, and the window rules take you straight to their workspace.
                 </p>
                 <p>
                     <strong>Presenting is one key too.</strong> <code>⌥ ⇧ Tab</code> sends the current
