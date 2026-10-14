@@ -691,6 +691,10 @@ a:hover {
   gap: 20px;
 }
 
+.projects-grid--tools {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .project-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -737,6 +741,12 @@ a:hover {
   background: var(--python-dim);
 }
 
+.project-lang[data-lang="shell"] {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-dim);
+}
+
 .project-links a {
   color: var(--text-muted);
   display: inline-flex;
@@ -767,6 +777,74 @@ a:hover {
 .project-blog--muted {
   color: var(--text-muted);
   font-weight: 500;
+}
+
+.projects-grid--featured {
+  margin-bottom: 32px;
+}
+
+.project-card--featured {
+  border-color: var(--accent-border);
+  border-top: 3px solid var(--accent);
+  background: linear-gradient(150deg, var(--accent-dim), transparent 65%), var(--surface);
+  min-width: 0;
+}
+
+.project-card--featured .project-top {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.project-card--featured .project-title {
+  font-size: 1.5rem;
+}
+
+.project-kind,
+.project-repo-name,
+.project-license {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 400;
+}
+
+.project-facts {
+  padding-left: 18px;
+  margin: 0 0 24px;
+  display: grid;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+}
+
+.project-facts li::marker {
+  color: var(--accent);
+}
+
+.project-facts strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.project-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.project-license {
+  margin-top: 12px;
+  font-family: var(--font-mono);
+}
+
+.projects-group-label {
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 /* ---------- Blog ---------- */
